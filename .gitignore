@@ -1,0 +1,8 @@
+mousemaster.exe
+*.exe
+*.log
+*.bak*
+*.jpg
+*.JPG
+*.tar.enc
+_to_delete/

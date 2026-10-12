@@ -41,6 +41,9 @@ if not exist ".git" (
 
 echo.
 echo === Committing changes ===
+rem .gitattributes says "* -text": re-add everything so files committed earlier with
+rem autocrlf conversion (LF .bat files) are stored byte-for-byte (CRLF) from now on.
+git add --renormalize .
 git add -A
 git commit -m "Update %DATE% %TIME:~0,5%"
 echo (nothing to commit is fine: it just pushes what is already committed)

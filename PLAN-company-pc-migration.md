@@ -43,7 +43,7 @@
 | ファイル | サイズ | sha256 | 備考 |
 |---|---|---|---|
 | `mousemaster.exe` | 81,590,130 byte | `b131a8206025300129195a0df36e85ac038d3612fadccc00d844c6dbfdaf8f2c` | 作者 petoncle/mousemaster の nightly **96c7f26**（2026-10-06 取得。個人PCの本番と同一）。単体で動く（Qt DLL は起動時に temp へ展開される） |
-| `mousemaster.properties` | 100,030 byte | `45c507a62f5e43fa895a5deccc6861c801dd578e7368c60b8454f829c4ffb21c` | 現行の本番設定（2026-10-12 版）。1,293 行、LF 改行のまま運ぶ（CRLF に直さない）。[31] Snipaste 連携（z で開始、もう一度 z で貼る）入り。Snipaste を入れないなら 3.5 の行を見て [31] の 7 行をコメントアウト |
+| `mousemaster.properties` | 102,172 byte | `1115bcaf6b9f2390597ee244fe86f5687b569c921f7a9c97efd597a61dd878e1` | 現行の本番設定（2026-10-12 版）。1,313 行、LF 改行のまま運ぶ（CRLF に直さない）。[31] Snipaste 連携（z で開始、もう一度 z で貼る）入り。Snipaste を入れないなら 3.5 の行を見て [31] の 7 行＋[31b] の 2 行をコメントアウト |
 | （任意）`cursors\spinner-arcbloom-red-32.ani`, `cursors\spinner-arcbloom-red-app-32.ani`, `cursors\pick-cursor.bat`, `cursors\remove-spinner-cursors.bat`, `cursors\backup-cursors.reg` | 各 189KB / 2.4KB 等 | — | 待機カーソルの差し替え。見た目だけなので最後、または省略可 |
 | （任意）`mm4-start.ico`, `mm4-stop.ico` | 各 369,214 byte | start `0c0ba858926bb52e8258fca4cce74c69e02684249a80fe907a5b07b6d7567f80` / stop `1d444dfb529f4a3ed12796b10f14ded1fe309d62a8c57eb98e8a186e9fd4e8e0` | スタートメニューの「mousemaster」「mousemaster stop」のアイコン対（紫＝起動、赤＝停止。2.6 節）。見た目だけ。無ければマウスのコントロールパネルのアイコンのまま |
 
@@ -233,7 +233,7 @@ Defender 以外の EDR が居たら、2.1 の様子見を長めに取る。**弾
 | **alt+g が OneCommander で効かない**（alt+f / alt+c 等は効く、mousemaster を止めても効かない） | NVIDIA アプリの G-Assist が **Alt+G をグローバルホットキーで掴む**（個人PCで 2026-10-07 に発生。NVIDIA が勝手に更新して掴んだ。ゲーム外では何も起きないので「効かない」に見える） | `check-altg-hotkey.bat`（A24/A25）を実行 → alt+g が TAKEN なら NVIDIA アプリ → 設定 → NVIDIA オーバーレイをオフ、またはオーバーレイ（Alt+Z）→ 歯車 → キーボードショートカットで G-Assist のキーを変える。他のキーでも同じ手が使える（ps1 の Probe 行を足す） | ○ |
 | 何も押していないのにカーソルが走り続ける | 移動キーを押したまま別モードに入り、離しがそのモードに落ちて StopMove が出ない型（個人PC 2026-10-07。arrowkey / temp-ZoomIt / screen-selection の 3 モードは [30] で塞いである）。別の型は「離しイベントの消失」（10 秒で暴走ブレーカー [28] が止める。モード跨ぎではブレーカーも効かない） | 止めるには同じ方向キーを押して離す。**何秒で止まったか・何を押して止まったかを記録**して個人PC側へ（ハーネス M51/M52 の総当たりで再現できる） | × |
 | 昇格ウィンドウ・通知フライアウトの上で効かない | 分岐B（非昇格） | 仕様 | — |
-| normal-mode で `z` を押すと F1 が飛ぶ（ヘルプが開く等） | [31] Snipaste 連携: `z` は Snipaste のスニップ開始ホットキー F1 をどのアプリでも注入する。個人PCでは Snipaste（ポータブル、Downloads\mousemaster_92\Snipaste-2.11.3-x64、ホットキー既定）を常駐させている | Snipaste を会社PCにも入れる（zip 展開のみ・インストール不要）か、入れないなら properties 末尾 [31] の `app-alias.snipaste`、`virtual-key.snip`、`normal-mode.remapping.snip*` の計 7 行を `#` でコメントアウト | ○ |
+| normal-mode で `z` を押すと F1 が飛ぶ（ヘルプが開く等） | [31] Snipaste 連携: `z` は Snipaste のスニップ開始ホットキー F1 をどのアプリでも注入する。個人PCでは Snipaste（ポータブル、Downloads\mousemaster_92\Snipaste-2.11.3-x64、ホットキー既定）を常駐させている | Snipaste を会社PCにも入れる（zip 展開のみ・インストール不要）か、入れないなら properties 末尾 [31] の `app-alias.snipaste`、`virtual-key.snip`、`normal-mode.remapping.snip*` の計 7 行と [31b] の `normal-mode.remapping.unpinoldest` / `arrowkey-mode.remapping.unpinoldest` を `#` でコメントアウト。[31b] の Alt+Z は F14 を送るだけで、受け手の `snipaste-unpin.ahk`（AutoHotkey 常駐）は 1c の方針どおり会社PCには入れない（F14 は他のアプリでは無視される） | ○ |
 
 **運用**: 最初の1週間は「直さずに記録する」。会社側 CLAUDE.md の「未着手・保留」に溜め、○ はその場で、× はまとめて個人PC側で直して properties を**1回だけ**運び直す。往復は1〜2回で収まる想定。
 ハーネスを会社PCに入れずに済ませる手として、会社側 Claude のクラウド側でハーネスを回す案もある（個人PCでも実機・クラウド両方で回している）。× が多くなったら別途準備する。

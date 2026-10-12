@@ -49,6 +49,7 @@ else { Write-Host ("  unexpected: first={0} second={1} error={2}" -f $a, $b, $e)
 Write-Host ''
 Write-Host '=== 1. Global hotkey probe (RegisterHotKey) ==='
 Probe 'alt+g' $MOD_ALT 0x47
+Probe 'alt+z' $MOD_ALT 0x5A
 Probe 'alt+f' $MOD_ALT 0x46
 Probe 'alt+s' $MOD_ALT 0x53
 Probe 'alt+c' $MOD_ALT 0x43

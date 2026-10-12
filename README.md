@@ -13,9 +13,11 @@
 | `mousemaster.properties` | 本番設定。先頭のヘッダに変更履歴と「なぜそうしたか」が全部ある |
 | `PLAN-company-pc-migration.md` | 持ち込み手順書。持ち込み先の Claude に読ませる前提で書いてある |
 | `*.bat` / `*.ps1`（25 本） | 起動・自動起動・即停止・カーソル復旧・診断の運用スクリプト（PLAN 付録A と同一） |
+| `snipaste-unpin.ahk` + `install-/remove-snipaste-unpin.bat` | 任意。Snipaste のピンを古い順に閉じる AutoHotkey v2 の常駐（mousemaster の Shift+Z → F14 で発火）。Snipaste と AutoHotkey v2 を入れている時だけ |
 | `cursors/` | 待機カーソルの差し替え（任意。見た目だけ） |
 | `mm4-start.ico` / `mm4-stop.ico` | スタートメニューの「mousemaster」「mousemaster stop」用アイコン（任意） |
 | `SHA256SUMS.txt` | 全ファイルの sha256。`mousemaster.exe` の分も先頭にある |
+| `.gitattributes` | `* -text`。改行を変換しない（`.bat`/`.ps1` は CRLF のまま、`.properties` は LF のまま）。これが無いと Windows の git が `.bat` を LF で保存し、Download ZIP の `.bat` が壊れる |
 
 ## 入っていないもの
 
@@ -29,7 +31,7 @@
 1. このページの **Code → Download ZIP** で落として、`Downloads\mousemaster_92` に展開する
    （フォルダ名は PLAN の手順がそう書いてあるため。中のスクリプトは相対名で呼び合うので同じフォルダに置く）。
 2. **Releases** から `mousemaster.exe` を落として同じフォルダに置く。
-3. PowerShell でハッシュを照合する（管理者権限不要）:
+3. PowerShell でハッシュを照合する（管理者権限不要）。`.bat` が LF になっていないかもこれで分かる（`SHA256SUMS.txt` は CRLF のファイルから計算してある）:
    ```powershell
    Get-FileHash -Algorithm SHA256 .\mousemaster.exe, .\mousemaster.properties | Format-List Path, Hash
    ```

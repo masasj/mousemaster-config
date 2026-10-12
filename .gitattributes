@@ -1,0 +1,7 @@
+# Store every file byte-for-byte, no line-ending conversion on any platform.
+# .bat / .ps1 / .ahk must stay CRLF (Japanese cmd misparses for/if blocks and ^
+# continuation lines when they are LF); .properties / .md stay LF. Without this,
+# Windows git (core.autocrlf=true) committed the .bat files as LF, and GitHub's
+# "Download ZIP" handed out broken scripts (found 2026-10-12; SHA256SUMS.txt
+# catches it). git archive / Download ZIP honour this attribute.
+* -text

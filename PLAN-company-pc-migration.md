@@ -4,6 +4,8 @@
 更新: 2026-10-06 即停止「alt+e → stop」とランチャーのアイコン（2.6 節、付録 A15〜A23）を追加。どちらも任意。
 更新: 2026-10-07 `mousemaster.properties` を更新（モード跨ぎで移動が止まらなくなる穴を塞いだ [30]）。3.5 に「alt+g が効かない＝NVIDIA G-Assist」と「カーソルが走り続ける」を追加、診断スクリプト A24/A25（任意）を追加。
 更新: 2026-10-12 `mousemaster.properties` を更新（[31] Snipaste 連携: z=スニップ開始、もう一度 z=その場に貼る）。3.5 に Snipaste 無しの時の注意を追加。この文書とスクリプト 25 本・properties・カーソル・アイコンは GitHub の `masasj/mousemaster-config` にも置いた（exe は Releases）。
+更新: 2026-10-15 exe を Build 95（663a1e1a）に、properties を 95 用（[32]: indicator の position=mouse / fill-opacity / fill-color）に更新。**両方を同時に入れ替えること**。
+更新: 2026-10-14 会社PCの移行報告（2026-10-13、分岐A で完了）を反映: Startup の `.disabled` 禁止、7 章の雛形のハッシュ、`undo-admin-autostart.bat` と `cursors/apply-cursors.ps1` をリポジトリに追加、運び方に GitHub を明記。
 **会社PC側のClaude（同じアカウントなので同じ skill が出る）が、この文書だけを頼りに進められる**ことを目標に書いてある。
 個人PCと会社PCの間でファイルを直接やりとりする手段は無い。運ぶのはユーザー。
 
@@ -42,12 +44,12 @@
 
 | ファイル | サイズ | sha256 | 備考 |
 |---|---|---|---|
-| `mousemaster.exe` | 81,590,130 byte | `b131a8206025300129195a0df36e85ac038d3612fadccc00d844c6dbfdaf8f2c` | 作者 petoncle/mousemaster の nightly **96c7f26**（2026-10-06 取得。個人PCの本番と同一）。単体で動く（Qt DLL は起動時に temp へ展開される） |
-| `mousemaster.properties` | 102,172 byte | `1115bcaf6b9f2390597ee244fe86f5687b569c921f7a9c97efd597a61dd878e1` | 現行の本番設定（2026-10-12 版）。1,313 行、LF 改行のまま運ぶ（CRLF に直さない）。[31] Snipaste 連携（z で開始、もう一度 z で貼る）入り。Snipaste を入れないなら 3.5 の行を見て [31] の 7 行＋[31b] の 2 行をコメントアウト |
+| `mousemaster.exe` | 81,881,734 byte | `e4cdb5498d67cae0eb9a06bd83fc71f85fd43a44a37b2a73d2e35e52147a7fbc` | 作者 petoncle/mousemaster の nightly **663a1e1a = Build 95**（2026-10-15 取得。個人PCの本番と同一）。単体で動く（Qt DLL は起動時に temp へ展開される）。**properties の 2026-10-15 版と対**: 95 より前の exe はその properties を読めず、逆に 10/12 版以前の properties は 95 で起動しない（[32]） |
+| `mousemaster.properties` | 103,128 byte | `5e5b22a42c6069ca749466bba91ede16424080fb0544413fb9d84be38bd2d99c` | 現行の本番設定（2026-10-15 版、Build 95 用）。1,321 行、LF 改行のまま運ぶ（CRLF に直さない）。[31] Snipaste 連携（z で開始、もう一度 z で貼る）入り。Snipaste を入れないなら 3.5 の行を見て [31] の 7 行＋[31b] の 2 行をコメントアウト |
 | （任意）`cursors\spinner-arcbloom-red-32.ani`, `cursors\spinner-arcbloom-red-app-32.ani`, `cursors\pick-cursor.bat`, `cursors\remove-spinner-cursors.bat`, `cursors\backup-cursors.reg` | 各 189KB / 2.4KB 等 | — | 待機カーソルの差し替え。見た目だけなので最後、または省略可 |
 | （任意）`mm4-start.ico`, `mm4-stop.ico` | 各 369,214 byte | start `0c0ba858926bb52e8258fca4cce74c69e02684249a80fe907a5b07b6d7567f80` / stop `1d444dfb529f4a3ed12796b10f14ded1fe309d62a8c57eb98e8a186e9fd4e8e0` | スタートメニューの「mousemaster」「mousemaster stop」のアイコン対（紫＝起動、赤＝停止。2.6 節）。見た目だけ。無ければマウスのコントロールパネルのアイコンのまま |
 
-運び方はユーザー次第（USB、Google Drive（このアカウントで使っている）、会社が許す手段）。
+運び方: GitHub `masasj/mousemaster-config`（Code → Download ZIP でこの文書・properties・スクリプト、Releases で exe。exe が無ければ petoncle/mousemaster の nightly を落としてハッシュで照合、2026-10-13 の会社PCはそうした）。ほかは USB、Google Drive など会社が許す手段。
 **会社PCに置いたら必ずハッシュを照合する**（PowerShell、管理者権限不要）:
 
 ```powershell
@@ -94,7 +96,7 @@ Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Run -ErrorActio
 Get-ScheduledTask -TaskName '*mousemaster*' -ErrorAction SilentlyContinue | Select-Object TaskName, State, @{n='RunLevel';e={$_.Principal.RunLevel}}
 ```
 
-見つかった起動口は「無効化 or ショートカットを `.disabled` にリネーム」で止める（消さない。戻せるように）。HKLM 側や Program Files 側は管理者が要るので、無ければユーザーに伝えて止めてもらうか、分岐Bで手動起動に統一して旧 v64 だけ止める。
+見つかった起動口は「無効化 or **Startup フォルダの外へ移す**（例: 隣に `v64-startup-disabled\` を作ってそこへ）」で止める（消さない。戻せるように）。**Startup の中で `.disabled` にリネームするのは駄目**: Windows はフォルダ内の全ファイルを開こうとするので、サインインのたびに「アプリを選択して .disabled ファイルを開く」が出る（会社PCで 2026-10-13 に発生）。HKLM 側や Program Files 側は管理者が要るので、無ければユーザーに伝えて止めてもらうか、分岐Bで手動起動に統一して旧 v64 だけ止める。
 
 **(2) 管理者権限。**
 
@@ -279,7 +281,7 @@ Win11 / <機種> / <配列> で mousemaster を運用。個人PCの PLAN-company
 
 ## 3. 現在地
 - exe: nightly 96c7f26、sha256 b131a820…（照合日 YYYY-MM-DD）
-- properties: sha256 749bb405…
+- properties: sha256 1115bcaf…（102,172 byte、2026-10-12 版。正は 1a 節と `SHA256SUMS.txt`。更新のたびに転記）
 - 分岐: A（昇格タスク mousemaster-admin）/ B（Startup ショートカット）
 - 即停止（2.6）: 入れた（A: タスク mousemaster-stop / B: 直接 kill）/ 入れていない（理由: ）。アイコン: 貼った / 貼っていない
 - 導入後チェック（4章）の結果: ...
@@ -1336,4 +1338,4 @@ Write-Host 'Done. The same text is in altg-check.txt.'
 Stop-Transcript | Out-Null
 ```
 
-（付録おわり。個人PC側の `mousemaster_92` に `undo-admin-autostart.bat`（分岐Aを全部戻す）、`fix-topmost.bat`（最前面貼り付きの解除）、`check-uiaccess.bat`（昇格の確認）もある。必要になったらユーザー経由で取り寄せる。）
+（付録おわり。`undo-admin-autostart.bat`（分岐Aを全部戻す）は 2026-10-14 からリポジトリにも入れた。個人PC側の `mousemaster_92` に `fix-topmost.bat`（最前面貼り付きの解除）、`check-uiaccess.bat`（昇格の確認）もある。必要になったらユーザー経由で取り寄せる。）

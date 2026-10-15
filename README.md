@@ -10,10 +10,11 @@
 
 | ファイル | 何か |
 |---|---|
-| `mousemaster.properties` | 本番設定。先頭のヘッダに変更履歴と「なぜそうしたか」が全部ある |
+| `mousemaster.properties` | 本番設定。先頭のヘッダに変更履歴と「なぜそうしたか」が全部ある。**2026-10-15 以降は Build 95（663a1e1a）以降の exe 専用**（indicator の position=mouse / fill-opacity / fill-color は旧 exe が読めない。旧 exe で使うなら [32] の 3 行を center / opacity / color に戻す） |
 | `PLAN-company-pc-migration.md` | 持ち込み手順書。持ち込み先の Claude に読ませる前提で書いてある |
 | `*.bat` / `*.ps1`（25 本） | 起動・自動起動・即停止・カーソル復旧・診断の運用スクリプト（PLAN 付録A と同一） |
-| `snipaste-unpin.ahk` + `install-/remove-snipaste-unpin.bat` | 任意。Snipaste のピンを古い順に閉じる AutoHotkey v2 の常駐（mousemaster の Shift+Z → F14 で発火）。Snipaste と AutoHotkey v2 を入れている時だけ |
+| `snipaste-unpin.ahk` + `install-/remove-snipaste-unpin.bat` | 任意。Snipaste のピンを古い順に閉じる AutoHotkey v2 の常駐（mousemaster の Alt+Z → F14 で発火）。Snipaste と AutoHotkey v2 を入れている時だけ |
+| `install-/remove-snipaste-startup.bat` | 任意。ポータブル版 Snipaste（`Snipaste-2.11.3-x64\` を同じフォルダに展開した前提）をサインイン時に起動する Startup ショートカット。Snipaste 側の「システム起動時に実行」でも同じ |
 | `cursors/` | 待機カーソルの差し替え（任意。見た目だけ） |
 | `mm4-start.ico` / `mm4-stop.ico` | スタートメニューの「mousemaster」「mousemaster stop」用アイコン（任意） |
 | `SHA256SUMS.txt` | 全ファイルの sha256。`mousemaster.exe` の分も先頭にある |

@@ -1,42 +1,41 @@
-# 会社PCへの移行プラン（v64 → 現行フル構成）— Claude間引き継ぎ版
+# 導入先PCへの移行プラン（v64 → 現行フル構成）— Claude間引き継ぎ版
 
-作成: 2026-09-25 個人PC側のClaudeが、`mousemaster_92` の実フォルダと `CLAUDE.md` を読んで作成。
+作成: 2026-09-25 元PC側のClaudeが、`mousemaster_92` の実フォルダと `CLAUDE.md` を読んで作成。
 更新: 2026-10-06 即停止「alt+e → stop」とランチャーのアイコン（2.6 節、付録 A15〜A23）を追加。どちらも任意。
 更新: 2026-10-07 `mousemaster.properties` を更新（モード跨ぎで移動が止まらなくなる穴を塞いだ [30]）。3.5 に「alt+g が効かない＝NVIDIA G-Assist」と「カーソルが走り続ける」を追加、診断スクリプト A24/A25（任意）を追加。
 更新: 2026-10-12 `mousemaster.properties` を更新（[31] Snipaste 連携: z=スニップ開始、もう一度 z=その場に貼る）。3.5 に Snipaste 無しの時の注意を追加。この文書とスクリプト 25 本・properties・カーソル・アイコンは GitHub の `masasj/mousemaster-config` にも置いた（exe は Releases）。
 更新: 2026-10-15 exe を Build 95（663a1e1a）に、properties を 95 用（[32]: indicator の position=mouse / fill-opacity / fill-color）に更新。**両方を同時に入れ替えること**。
-更新: 2026-10-14 会社PCの移行報告（2026-10-13、分岐A で完了）を反映: Startup の `.disabled` 禁止、7 章の雛形のハッシュ、`undo-admin-autostart.bat` と `cursors/apply-cursors.ps1` をリポジトリに追加、運び方に GitHub を明記。
-**会社PC側のClaude（同じアカウントなので同じ skill が出る）が、この文書だけを頼りに進められる**ことを目標に書いてある。
-個人PCと会社PCの間でファイルを直接やりとりする手段は無い。運ぶのはユーザー。
+更新: 2026-10-14 導入先PCの移行報告（2026-10-13、分岐A で完了）を反映: Startup の `.disabled` 禁止、7 章の雛形のハッシュ、`undo-admin-autostart.bat` と `cursors/apply-cursors.ps1` をリポジトリに追加、運び方に GitHub を明記。
+**導入先PC側のClaude（同じアカウントなので同じ skill が出る）が、この文書だけを頼りに進められる**ことを目標に書いてある。
+元PCと導入先PCの間でファイルを直接やりとりする手段は無い。運ぶのはユーザー。
 
-**ユーザーが会社PCのClaudeに貼る一文（案）**:
-> `C:\Users\<会社のユーザー名>\Downloads\mousemaster_92\PLAN-company-pc-migration.md` を読んで、書いてある順に進めて。判断が要るところだけ聞いて。
+**ユーザーが導入先PCのClaudeに貼る一文（案）**:
+> `C:\Users\<ユーザー名>\Downloads\mousemaster_92\SETUP.md` を読んで、書いてある順に進めて。判断が要るところだけ聞いて。
 
 （.md をファイルごと運ばない場合は、この文書の全文をチャットに貼ってもよい。付録Aのスクリプトはそこから再現できる。）
 
 ---
 
-## 会社PC側のClaudeへ（最初に読む）
+## 導入先PC側のClaudeへ（最初に読む）
 
-- **役割**: 会社PCに、個人PCの mousemaster 運用環境（2026-09-25 時点）を**1回だけ複製する**。継続開発はしない。
+- **役割**: 導入先PCに、元PCの mousemaster 運用環境（2026-09-25 時点）を**1回だけ複製する**。継続開発はしない。
 - **やること**: 2章の順に進める。まず「2.0 現状調査」（何も変えない）→「2.1 最小構成」→ 様子見 → 分岐A/B。
 - **やらないこと**:
-  - `mousemaster.properties` の編集は 3 章の「変えてよいもの／だめなもの」に従う。数値の調整・切替・機能オフはその場でよい。**キーの組み合わせ（コンボ・ガード・remapping・macro）は会社PCで触らない**。ハーネスが無いので ctrl+c や alt+tab を壊しても気づけない（個人PCで6回やった）。直したい点は会社側 CLAUDE.md の「未着手・保留」に溜め、まとめて個人PC側で直す（3.5 節）。
-  - セキュリティソフト／AppLocker／WDAC 等に弾かれたら**回避しない**。止めてユーザーに報告する。それがこの会社の答え。
-  - 旧v64と新しい exe を**同時に動かさない**（2つのインスタンスがフックを奪い合って両方おかしくなる。個人PCで実証済み）。
+  - `mousemaster.properties` の編集は 3 章の「変えてよいもの／だめなもの」に従う。数値の調整・切替・機能オフはその場でよい。**キーの組み合わせ（コンボ・ガード・remapping・macro）は導入先PCで触らない**。ハーネスが無いので ctrl+c や alt+tab を壊しても気づけない（元PCで6回やった）。直したい点は導入先側 CLAUDE.md の「未着手・保留」に溜め、まとめて元PC側で直す（3.5 節）。
+  - セキュリティソフトや実行制限に弾かれたら**回避しない**。止めてユーザーに報告する。
+  - 旧v64と新しい exe を**同時に動かさない**（2つのインスタンスがフックを奪い合って両方おかしくなる。元PCで実証済み）。
   - `restart-mousemaster.bat` は使わない（5章）。
-- **skill `/mm` について**: 同じアカウントなので会社PCでも出る。あの skill が言う「ハーネス `run.sh` を回せ」「`sync-src.sh`」「`WATCH-state.json`」は**個人PCの話で、会社PCには存在しない**。従わなくてよい。会社PCでは 7章の雛形で `CLAUDE.md` を作り、以後はそれを入口にする。
-- **終わったら**: 7章の `CLAUDE.md` を会社フォルダに作る → 8章の報告テンプレをユーザーに渡す（個人PC側の `CLAUDE.md` の TODO #14 を閉じるため）。
+- **skill `/mm` について**: 同じアカウントなので導入先PCでも出る。あの skill が言う「ハーネス `run.sh` を回せ」「`sync-src.sh`」「`WATCH-state.json`」は**元PCの話で、導入先PCには存在しない**。従わなくてよい。導入先PCでは 7章の雛形で `CLAUDE.md` を作り、以後はそれを入口にする。
+- **終わったら**: 7章の `CLAUDE.md` を導入先のフォルダに作る → 8章の報告テンプレをユーザーに渡す（元PC側の `CLAUDE.md` の TODO #14 を閉じるため）。
 
 ## 0. 前提（ユーザー回答、2026-09-25）
 
 | 項目 | 回答 |
 |---|---|
-| 会社PC | Win11、個人PCと大体同じセットアップ。ただし mousemaster は **v64 のまま**（2025-07-19 頃の構成） |
-| 持っていく範囲 | **今の個人PCと同じフル構成**（昇格自動起動・スタートメニュー・PowerToys 側の調整まで） |
+| 導入先PC | Win11、元PCと大体同じセットアップ。ただし mousemaster は **v64 のまま**（2025-07-19 頃の構成） |
+| 持っていく範囲 | **今の元PCと同じフル構成**（昇格自動起動・スタートメニュー・PowerToys 側の調整まで） |
 | 管理者権限 | **不明** → 2.0 で確認して分岐 A/B |
-| IT／セキュリティ | **少し不安あり**（EDR 等の有無・実際に弾かれるかは未確認）→ 最小構成で様子見してから |
-| 今後の運用 | **追いつかせて終わり**（会社PCでの継続開発・同期の仕組みは不要） |
+| 今後の運用 | **追いつかせて終わり**（導入先PCでの継続開発・同期の仕組みは不要） |
 
 ## 1. 何を運ぶか
 
@@ -44,13 +43,13 @@
 
 | ファイル | サイズ | sha256 | 備考 |
 |---|---|---|---|
-| `mousemaster.exe` | 81,881,734 byte | `e4cdb5498d67cae0eb9a06bd83fc71f85fd43a44a37b2a73d2e35e52147a7fbc` | 作者 petoncle/mousemaster の nightly **663a1e1a = Build 95**（2026-10-15 取得。個人PCの本番と同一）。単体で動く（Qt DLL は起動時に temp へ展開される）。**properties の 2026-10-15 版と対**: 95 より前の exe はその properties を読めず、逆に 10/12 版以前の properties は 95 で起動しない（[32]） |
+| `mousemaster.exe` | 81,881,734 byte | `e4cdb5498d67cae0eb9a06bd83fc71f85fd43a44a37b2a73d2e35e52147a7fbc` | 作者 petoncle/mousemaster の nightly **663a1e1a = Build 95**（2026-10-15 取得。元PCの本番と同一）。単体で動く（Qt DLL は起動時に temp へ展開される）。**properties の 2026-10-15 版と対**: 95 より前の exe はその properties を読めず、逆に 10/12 版以前の properties は 95 で起動しない（[32]） |
 | `mousemaster.properties` | 103,128 byte | `5e5b22a42c6069ca749466bba91ede16424080fb0544413fb9d84be38bd2d99c` | 現行の本番設定（2026-10-15 版、Build 95 用）。1,321 行、LF 改行のまま運ぶ（CRLF に直さない）。[31] Snipaste 連携（z で開始、もう一度 z で貼る）入り。Snipaste を入れないなら 3.5 の行を見て [31] の 7 行＋[31b] の 2 行をコメントアウト |
 | （任意）`cursors\spinner-arcbloom-red-32.ani`, `cursors\spinner-arcbloom-red-app-32.ani`, `cursors\pick-cursor.bat`, `cursors\remove-spinner-cursors.bat`, `cursors\backup-cursors.reg` | 各 189KB / 2.4KB 等 | — | 待機カーソルの差し替え。見た目だけなので最後、または省略可 |
 | （任意）`mm4-start.ico`, `mm4-stop.ico` | 各 369,214 byte | start `0c0ba858926bb52e8258fca4cce74c69e02684249a80fe907a5b07b6d7567f80` / stop `1d444dfb529f4a3ed12796b10f14ded1fe309d62a8c57eb98e8a186e9fd4e8e0` | スタートメニューの「mousemaster」「mousemaster stop」のアイコン対（紫＝起動、赤＝停止。2.6 節）。見た目だけ。無ければマウスのコントロールパネルのアイコンのまま |
 
-運び方: GitHub `masasj/mousemaster-config`（Code → Download ZIP でこの文書・properties・スクリプト、Releases で exe。exe が無ければ petoncle/mousemaster の nightly を落としてハッシュで照合、2026-10-13 の会社PCはそうした）。ほかは USB、Google Drive など会社が許す手段。
-**会社PCに置いたら必ずハッシュを照合する**（PowerShell、管理者権限不要）:
+運び方: GitHub `masasj/mousemaster-config`（Code → Download ZIP でこの文書・properties・スクリプト、Releases で exe。exe が無ければ petoncle/mousemaster の nightly を落としてハッシュで照合、2026-10-13 の導入先PCはそうした）。ほかは USB など。
+**導入先PCに置いたら必ずハッシュを照合する**（PowerShell、管理者権限不要）:
 
 ```powershell
 Get-FileHash -Algorithm SHA256 .\mousemaster.exe, .\mousemaster.properties | Format-List Path, Hash
@@ -60,9 +59,9 @@ Get-FileHash -Algorithm SHA256 .\mousemaster.exe, .\mousemaster.properties | For
 
 ### 1b. この文書から再現するもの（付録A、テキスト）
 
-会社フォルダに置く運用スクリプト 25 本（A1〜A14 の 14 本＋2.6 節の即停止・アイコン用 A15〜A23 の 9 本＋診断用 A24〜A25 の 2 本。後の 11 本は任意）。全文を付録Aに載せた。**個人PCと同じ内容にすること**（1年分の踏み抜きが反映されている）。
+導入先のフォルダに置く運用スクリプト 25 本（A1〜A14 の 14 本＋2.6 節の即停止・アイコン用 A15〜A23 の 9 本＋診断用 A24〜A25 の 2 本。後の 11 本は任意）。全文を付録Aに載せた。**元PCと同じ内容にすること**（1年分の踏み抜きが反映されている）。
 
-保存規則（個人PC側の不変条件）:
+保存規則（元PC側の不変条件）:
 - `.bat` / `.ps1` は **ASCII のみ・CRLF 改行**。日本語Windowsの cmd は UTF-8 や LF だと `for`/`if` ブロックや `^` 継続行の解析が壊れて黙って落ちる。付録Aのスクリプトはすべて英語コメントなので ASCII で問題ない。
 - ファイル名は付録Aの見出しどおり（他のスクリプトが相対名で呼び合っている）。
 - `.bat` の `echo` 行に裸の `>` を書かない（リダイレクトになって対象ファイルを空にする。実害あり）。
@@ -71,20 +70,20 @@ Get-FileHash -Algorithm SHA256 .\mousemaster.exe, .\mousemaster.properties | For
 
 | 対象 | 理由 |
 |---|---|
-| `effects-pr/` `docs-pr/` `icon/`、`mousemaster_test_harness`、`.git`、ソース一式 | 会社PCでは開発しない。ハーネスは 3.5 節の運用（コンボ変更は個人PC側で）なら不要。コンボ変更が多くなったら別途持ち込む |
-| `mousemaster.properties.bak-*`（40件超）、`test-*.properties`、`LOG.md`、個人PCの `CLAUDE.md`、`WATCH-state.json`、写真 | デバッグ史・私物。会社PCに置く理由がない |
-| `fix-other-tasks.bat/.ps1` | 個人PCにだけあった旧タスク（`mousemaster-fast-autostart` / `mousemaster-resume-start`）の後始末。会社PCには無いので no-op |
+| `effects-pr/` `docs-pr/` `icon/`、`mousemaster_test_harness`、`.git`、ソース一式 | 導入先PCでは開発しない。ハーネスは 3.5 節の運用（コンボ変更は元PC側で）なら不要。コンボ変更が多くなったら別途持ち込む |
+| `mousemaster.properties.bak-*`（40件超）、`test-*.properties`、`LOG.md`、元PCの `CLAUDE.md`、`WATCH-state.json`、写真 | デバッグ史・私物。導入先PCに置く理由がない |
+| `fix-other-tasks.bat/.ps1` | 元PCにだけあった旧タスク（`mousemaster-fast-autostart` / `mousemaster-resume-start`）の後始末。導入先PCには無いので no-op |
 | `fix-start-menu-entry.bat/.ps1` | `add-start-menu-shortcut` と役割が重なる（既存の `mousemaster.lnk` を差し替える版）。新規なら add の方だけでよい |
-| `fix-topmost.bat/.ps1`、`check-uiaccess.bat/.ps1`、`swap-nightly.*`、`get-nightly.*`、`switch-build.*` | 個人PC側の運用・調査用。必要になったら個人PCから取る |
-| `claude-to-front.ahk` 一式 | AutoHotkey v2 のインストールが要る＝会社PCに常駐フックが1本増える。「少し不安」の前提では**入れない**。欲しくなったら別判断 |
-| **ExplorerPatcher／タスクバー左置き・時計書式などの Windows シェル改造** | mousemaster と無関係。未署名 DLL でシェルを書き換えるのは mousemaster 以上に会社PCでは目立つ。**スコープ外** |
+| `fix-topmost.bat/.ps1`、`check-uiaccess.bat/.ps1`、`swap-nightly.*`、`get-nightly.*`、`switch-build.*` | 元PC側の運用・調査用。必要になったら元PCから取る |
+| `claude-to-front.ahk` 一式 | AutoHotkey v2 のインストールが要るので**入れない**。欲しくなったら別判断 |
+| **ExplorerPatcher／タスクバー左置き・時計書式などの Windows シェル改造** | mousemaster と無関係。**スコープ外** |
 
-## 2. 会社PCでの手順
+## 2. 導入先PCでの手順
 
 ### 2.0 現状調査（何も変えない。全部 PowerShell 読み取りのみ）
 
 **(1) 旧 v64 の居場所と、その自動起動。**
-`mousemaster.properties` のヘッダに「由来: `C:\Program Files\mousemaster` (v64)」とあるので、**会社PCの v64 も `C:\Program Files\mousemaster` にある可能性が高い**。Program Files は管理者でないと書き換えられないので、**そこは触らず放置**し、新しい方を Downloads 側に置いて切り替える。
+`mousemaster.properties` のヘッダに「由来: `C:\Program Files\mousemaster` (v64)」とあるので、**導入先PCの v64 も `C:\Program Files\mousemaster` にある可能性が高い**。Program Files は管理者でないと書き換えられないので、**そこは触らず放置**し、新しい方を Downloads 側に置いて切り替える。
 ただし**旧 v64 が自動起動していたら止める**（二重起動は禁忌）。探す場所:
 
 ```powershell
@@ -96,7 +95,7 @@ Get-ItemProperty HKLM:\Software\Microsoft\Windows\CurrentVersion\Run -ErrorActio
 Get-ScheduledTask -TaskName '*mousemaster*' -ErrorAction SilentlyContinue | Select-Object TaskName, State, @{n='RunLevel';e={$_.Principal.RunLevel}}
 ```
 
-見つかった起動口は「無効化 or **Startup フォルダの外へ移す**（例: 隣に `v64-startup-disabled\` を作ってそこへ）」で止める（消さない。戻せるように）。**Startup の中で `.disabled` にリネームするのは駄目**: Windows はフォルダ内の全ファイルを開こうとするので、サインインのたびに「アプリを選択して .disabled ファイルを開く」が出る（会社PCで 2026-10-13 に発生）。HKLM 側や Program Files 側は管理者が要るので、無ければユーザーに伝えて止めてもらうか、分岐Bで手動起動に統一して旧 v64 だけ止める。
+見つかった起動口は「無効化 or **Startup フォルダの外へ移す**（例: 隣に `v64-startup-disabled\` を作ってそこへ）」で止める（消さない。戻せるように）。**Startup の中で `.disabled` にリネームするのは駄目**: Windows はフォルダ内の全ファイルを開こうとするので、サインインのたびに「アプリを選択して .disabled ファイルを開く」が出る（導入先PCで 2026-10-13 に発生）。HKLM 側や Program Files 側は管理者が要るので、無ければユーザーに伝えて止めてもらうか、分岐Bで手動起動に統一して旧 v64 だけ止める。
 
 **(2) 管理者権限。**
 
@@ -107,34 +106,27 @@ whoami /groups | findstr /C:"S-1-5-32-544"
 `BUILTIN\Administrators` の行が出れば UAC で昇格できる（分岐A）。出なければ分岐B。ドメイン参加PCでは出ないことが多い。
 （付録Aの `setup-admin-autostart.bat` は自分で UAC を出して昇格するので、行が出ているなら「管理者として実行」を手で選ぶ必要はない。）
 
-**(3) セキュリティソフト。**
-
-```powershell
-Get-CimInstance -Namespace root/SecurityCenter2 -ClassName AntiVirusProduct | Select-Object displayName
-Get-Service | Where-Object { $_.DisplayName -match 'CrowdStrike|Sentinel|Carbon|Cortex|Defender|ESET|Trend|Symantec|McAfee|Sophos|Cybereason|Tanium' } | Select-Object DisplayName, Status
-```
-
-Defender 以外の EDR が居たら、2.1 の様子見を長めに取る。**弾かれたら回避せず報告**。
+**(3) セキュリティソフト。** 止められたら回避せず、その場で止めてユーザーに報告する（不変条件）。
 
 **(4) キーボード配列。** 設定 > 時刻と言語 > 言語と地域 > 日本語 > キーボードレイアウト。`mousemaster.properties` は **jp-kana-jis 前提**（かな・`\`・`ろ` の扱いを含む）。JIS でなければ一部のキーが合わない。ユーザーに聞く。
 
-**(5) 機種。** 個人PCはノートPC。「内蔵キーボードで Win キーが死ぬ → Fn+F2」等は**その機種の癖**。会社PCが別機種なら個人PC側の記録を鵜呑みにしない。
+**(5) 機種。** 元PCはノートPC。「内蔵キーボードで Win キーが死ぬ → Fn+F2」等は**その機種の癖**。導入先PCが別機種なら元PC側の記録を鵜呑みにしない。
 
 ### 2.1 最小構成で動作確認（非昇格・自動起動なし）→ 数日様子見
 
-1. 会社PCに `C:\Users\<会社のユーザー名>\Downloads\mousemaster_92` を作る。
-   （名前を `mousemaster_92` に揃える理由: skill `/mm` が Downloads 直下の `mousemaster*` からバージョン番号最大のフォルダを探すため。中身は 96c7f26 だが名前は個人PCに合わせる。）
+1. 導入先PCに `C:\Users\<導入先のユーザー名>\Downloads\mousemaster_92` を作る。
+   （名前を `mousemaster_92` に揃える理由: skill `/mm` が Downloads 直下の `mousemaster*` からバージョン番号最大のフォルダを探すため。中身は 96c7f26 だが名前は元PCに合わせる。）
 2. `mousemaster.exe` と `mousemaster.properties` を置き、**1a のハッシュを照合**。
 3. 付録Aから最低限 `mousemaster-start.bat`, `mousemaster-autostart.bat`, `stop-mousemaster.bat`, `show-version.bat`, `restore-cursor.bat`, `restore-cursor.ps1` を作る（ASCII+CRLF）。
 4. 旧 v64 が動いていたら止める（2.0(1)）。
-5. `show-version.bat` → 出力をユーザーに見せる（個人PC側と照合したい）。
+5. `show-version.bat` → 出力をユーザーに見せる（元PC側と照合したい）。
 6. `mousemaster-start.bat` をダブルクリック。`/MIN` で畳まれた窓が出て、`hide-console=true` により約1秒で消える。**`mousemaster.log` がフォルダに生成される**のが起動の証拠。
 7. 動作: `leftctrl+leftalt` で normal-mode → `f` でヒント → `esc`。`q` で idle-mode。
-8. **ここで数日〜1週間、手動起動のまま普段使いする。** セキュリティソフトの警告・IT からの連絡が無ければ次へ。何か引っかかれば、その時点で「フル構成にしない」と決められる。先に全部入れると切り分けられない。
+8. **ここで数日〜1週間、手動起動のまま普段使いする。** 問題が無ければ次へ。何か引っかかれば、その時点で「フル構成にしない」と決められる。先に全部入れると切り分けられない。
 
 ### 2.2 分岐A: 管理者権限あり → 昇格自動起動（フル構成）
 
-なぜ昇格か: 昇格していないと UIAccess が取れず、タスクバー・通知フライアウト・昇格ウィンドウ（タスクマネージャー等）の上に UI ヒントが出ない。個人PCは 2026-08-28 からこの運用。
+なぜ昇格か: 昇格していないと UIAccess が取れず、タスクバー・通知フライアウト・昇格ウィンドウ（タスクマネージャー等）の上に UI ヒントが出ない。元PCは 2026-08-28 からこの運用。
 
 1. 付録Aの残り（`setup-admin-autostart.bat/.ps1`, `start-mousemaster-admin.bat`, `check-admin-setup.bat/.ps1`, `add-start-menu-shortcut.bat/.ps1`）を作る。
 2. 動いている mousemaster を `stop-mousemaster.bat` で止める（UAC が1回出る）。
@@ -157,19 +149,19 @@ Defender 以外の EDR が居たら、2.1 の様子見を長めに取る。**弾
 
 | 設定 | 内容 | 理由 |
 |---|---|---|
-| **Mouse Vanish を OFF** | `main.cpl`（マウスのプロパティ）> ポインター オプション > 「文字の入力中にポインターを非表示にする」の**チェックを外す** | `render-as-cursor=true` の運用と相性が悪く、入力中にカーソルとインジケーターが消える（GitHub #86 で確定。個人PCは 2026-08-16 から OFF） |
-| PowerToys があるなら **Always On Top を機能ごとオフ** | PowerToys 設定 > Always On Top > 無効 | 設定が仮想デスクトップ切替で Win+Ctrl+矢印 を送る間に `t` が混ざると Win+Ctrl+T（AoT）が成立し、窓が最前面に貼り付く。個人PCで 6 回踏んで機能ごと切った |
-| PowerToys Keyboard Manager の NumLock→Disable | **やらない** | 個人PC（ノート）固有の誤爆対策。副作用（Kinesis の NumLk も死ぬ）もある |
+| **Mouse Vanish を OFF** | `main.cpl`（マウスのプロパティ）> ポインター オプション > 「文字の入力中にポインターを非表示にする」の**チェックを外す** | `render-as-cursor=true` の運用と相性が悪く、入力中にカーソルとインジケーターが消える（GitHub #86 で確定。元PCは 2026-08-16 から OFF） |
+| PowerToys があるなら **Always On Top を機能ごとオフ** | PowerToys 設定 > Always On Top > 無効 | 設定が仮想デスクトップ切替で Win+Ctrl+矢印 を送る間に `t` が混ざると Win+Ctrl+T（AoT）が成立し、窓が最前面に貼り付く。元PCで 6 回踏んで機能ごと切った |
+| PowerToys Keyboard Manager の NumLock→Disable | **やらない** | 元PC（ノート）固有の誤爆対策。副作用（Kinesis の NumLk も死ぬ）もある |
 | 「タスクバーの位置」等のシェル設定 | **触らない** | スコープ外（1c） |
 
 ### 2.5 任意（最後に、余裕があれば）
 
-- **待機カーソル**（アーク・ブルーム赤）: `cursors\` の 1a の 5 ファイルを会社フォルダの `cursors\` に置き、`pick-cursor.bat` で **3** を選ぶ。戻すのは **0** または `remove-spinner-cursors.bat`（`backup-cursors.reg` は個人PCの原本なので会社PCでは「Windows 標準に戻す」用途にだけ使う）。**差し替えたら mousemaster を再起動**（normal-mode は起動時に撮ったカーソルのスナップショットを使い続けるため。個人PCで確認済み）。
+- **待機カーソル**（アーク・ブルーム赤）: `cursors\` の 1a の 5 ファイルを導入先のフォルダの `cursors\` に置き、`pick-cursor.bat` で **3** を選ぶ。戻すのは **0** または `remove-spinner-cursors.bat`（`backup-cursors.reg` は元PCの原本なので導入先PCでは「Windows 標準に戻す」用途にだけ使う）。**差し替えたら mousemaster を再起動**（normal-mode は起動時に撮ったカーソルのスナップショットを使い続けるため。元PCで確認済み）。
 - `claude-to-front.ahk`: 入れない（1c）。
 
-### 2.6 任意: 即停止「alt+e → stop」とアイコン（個人PCで 2026-10-04 に追加。丸ごと飛ばしてよい）
+### 2.6 任意: 即停止「alt+e → stop」とアイコン（元PCで 2026-10-04 に追加。丸ごと飛ばしてよい）
 
-個人PCでは、ゲームの前などに mousemaster を **UAC なしで一発で落とす**ために、スタートメニューに「mousemaster stop」を置き、PowerToys Run（alt+e）で `stop` と打って Enter で止めている。無くても本体は動く。止めるだけなら `stop-mousemaster.bat`（UAC 1回）かタスクマネージャーで足りる。**会社PCで難しければここは飛ばす。** 入れるなら 2.2 / 2.3 が終わって落ち着いてから。
+元PCでは、ゲームの前などに mousemaster を **UAC なしで一発で落とす**ために、スタートメニューに「mousemaster stop」を置き、PowerToys Run（alt+e）で `stop` と打って Enter で止めている。無くても本体は動く。止めるだけなら `stop-mousemaster.bat`（UAC 1回）かタスクマネージャーで足りる。**導入先PCで難しければここは飛ばす。** 入れるなら 2.2 / 2.3 が終わって落ち着いてから。
 
 | 分岐 | 入れ方 | 何が起きるか |
 |---|---|---|
@@ -178,67 +170,67 @@ Defender 以外の EDR が居たら、2.1 の様子見を長めに取る。**弾
 
 どちらも中身は `stop-mousemaster-task.ps1`（`Stop-Process -Force` → `SPI_SETCURSORS` でシステムカーソルを戻す。結果は `mm-stop.log` に1行ずつ）。**A の環境で B の `stop-mousemaster-direct.bat` を使っても止まらない**（非昇格から昇格プロセスは落とせない。`mm-stop.log` に `still running after kill` と残る）。逆（B の環境で A のスクリプト）はタスクが無いので動かない。分岐に合わせること。
 
-使い方: PowerToys Run があれば alt+e（個人PCの設定。PowerToys の既定は alt+space）→ `stop` → Enter。**PowerToys が無ければ Windows キー → `mousemaster stop` と打って Enter**（スタートメニューの検索。同じショートカットが起動する）。PowerToys は無くてよいし、このために入れなくてよい。
+使い方: PowerToys Run があれば alt+e（元PCの設定。PowerToys の既定は alt+space）→ `stop` → Enter。**PowerToys が無ければ Windows キー → `mousemaster stop` と打って Enter**（スタートメニューの検索。同じショートカットが起動する）。PowerToys は無くてよいし、このために入れなくてよい。
 
-アイコン（任意の任意）: 1a の `mm4-start.ico` / `mm4-stop.ico` を会社フォルダに置いて `set-mousemaster-icons.bat`（管理者権限不要）。「mousemaster」「mousemaster (admin)」「mousemaster stop」のうち存在するものに貼る。PowerToys Run はアイコンをキャッシュするので、変わって見えないときは PowerToys をトレイから終了して起動し直す。.ico が無ければマウスのコントロールパネルのアイコンのままで、動作に差はない。
+アイコン（任意の任意）: 1a の `mm4-start.ico` / `mm4-stop.ico` を導入先のフォルダに置いて `set-mousemaster-icons.bat`（管理者権限不要）。「mousemaster」「mousemaster (admin)」「mousemaster stop」のうち存在するものに貼る。PowerToys Run はアイコンをキャッシュするので、変わって見えないときは PowerToys をトレイから終了して起動し直す。.ico が無ければマウスのコントロールパネルのアイコンのままで、動作に差はない。
 
 入らないときの逃げ道（上から順に）:
-- PowerShell スクリプトの実行が止められている（AppLocker 等）→ 2.1 の他のスクリプトも同じ条件なので、そこで既に分かっているはず。即停止だけなら `taskkill /F /IM mousemaster.exe` の1行の .bat でも止まる（カーソルは次回起動時に mousemaster が自分で直す。issue 83）。昇格運用ならその .bat に UAC が出る。
+- PowerShell スクリプトの実行が止められている（実行ポリシー等）→ 2.1 の他のスクリプトも同じ条件なので、そこで既に分かっているはず。即停止だけなら `taskkill /F /IM mousemaster.exe` の1行の .bat でも止まる（カーソルは次回起動時に mousemaster が自分で直す。issue 83）。昇格運用ならその .bat に UAC が出る。
 - スケジュールタスクの登録が禁止されている（A で `Register-ScheduledTask` が失敗。`setup-stop-task.log` に `FAILED:` が残る）→ B の `setup-stop-shortcut.bat` にする。ただし昇格した mousemaster は止められないので、止めるのは `stop-mousemaster.bat`（UAC）のまま。
 - スタートメニューの `Programs` フォルダに書けない → 入口を諦める。`stop-mousemaster-admin.bat` / `stop-mousemaster-direct.bat` をダブルクリックしても同じことが起きる（ショートカットはただの入口）。
 
 戻す: A は `remove-stop-task.bat`（タスク削除＋ショートカット削除、UAC 1回）。B は `%APPDATA%\Microsoft\Windows\Start Menu\Programs\mousemaster stop.lnk` を消すだけ。
 
-## 3. `mousemaster.properties` について会社PCで知っておくこと
+## 3. `mousemaster.properties` について導入先PCで知っておくこと
 
 - **絶対パス・ユーザー名は含まれていない**（grep で確認）。そのまま置ける。
 - 前提にしている環境: jp-kana-jis、Mouse Vanish OFF、`hide-console=true`（`mousemaster-start.bat` の `/MIN` と対になっている。片方だけ変えない）。
 - `logging.level=INFO` / `logging.key-redaction=pseudonymize` — このまま。TRACE にすると打鍵が平文でログに残る。
-- `ui-hint-mode.hint.type=ui-vision`、`ui-area=active-screen` — 作者の画像認識ベースの UI ヒント。GPU に依存するので**会社PCで `a` のヒントが遅い・出ないなら、`ui-hint-mode.hint.type=ui-accessibility` と `ui-hint-mode.hint.ui-area=active-window` の組（実測 55〜96ms、個人PCで長く常用した安定版）に変える**。（3.5 節の「○」の代表例）。変えたらユーザーに伝える。
+- `ui-hint-mode.hint.type=ui-vision`、`ui-area=active-screen` — 作者の画像認識ベースの UI ヒント。GPU に依存するので**導入先PCで `a` のヒントが遅い・出ないなら、`ui-hint-mode.hint.type=ui-accessibility` と `ui-hint-mode.hint.ui-area=active-window` の組（実測 55〜96ms、元PCで長く常用した安定版）に変える**。（3.5 節の「○」の代表例）。変えたらユーザーに伝える。
 - アプリ条件付きのバインド（Claude アプリ限定の ctrl+, / ctrl+m ズーム、OneCommander の alt+g 素通し、ZoomIt の ctrl+i/k/l 素通し、Brave）は、そのアプリが無ければ**不活性なだけ**。害はない。
 - 変更履歴はファイル先頭のヘッダ [1]〜[28] に全部ある。読めば「なぜそうなっているか」が分かる。
-- **会社PCで変えてよいもの（○、ハーネス無しで安全）**: 数値だけの調整（`hint.font-size`、`hint.grid-cell-width/height`、`zoom.percent`、`indicator.size`、速度系）、`ui-hint-mode.hint.type` / `ui-area` の切替、既にある行を `#` でコメントアウトして**機能を止める**こと。変えたら会社側 CLAUDE.md に1行ずつ記録し、ユーザーに伝える（個人PC側に取り込む）。
-- **会社PCで変えてはいけないもの（×）**: コンボの追加・変更、`_{...}` / `^{...}` のガード、`remapping.*`、`macro.*`、`key-alias`、`app-alias`。ここが崩れると ctrl+c / ctrl+v / alt+tab / Win+D / alt+h が**黙って**死ぬ。個人PCのハーネス（301項目）がそれを見張っているので、この種の変更は「会社側 CLAUDE.md の未着手に書く → 個人PCで直してハーネスを通す → properties をファイルごと運ぶ」で行う。
-- 個人PC側の不変条件のうち会社PCでも効くもの:
+- **導入先PCで変えてよいもの（○、ハーネス無しで安全）**: 数値だけの調整（`hint.font-size`、`hint.grid-cell-width/height`、`zoom.percent`、`indicator.size`、速度系）、`ui-hint-mode.hint.type` / `ui-area` の切替、既にある行を `#` でコメントアウトして**機能を止める**こと。変えたら導入先側 CLAUDE.md に1行ずつ記録し、ユーザーに伝える（元PC側に取り込む）。
+- **導入先PCで変えてはいけないもの（×）**: コンボの追加・変更、`_{...}` / `^{...}` のガード、`remapping.*`、`macro.*`、`key-alias`、`app-alias`。ここが崩れると ctrl+c / ctrl+v / alt+tab / Win+D / alt+h が**黙って**死ぬ。元PCのハーネス（301項目）がそれを見張っているので、この種の変更は「導入先側 CLAUDE.md の未着手に書く → 元PCで直してハーネスを通す → properties をファイルごと運ぶ」で行う。
+- 元PC側の不変条件のうち導入先PCでも効くもの:
   - 裸の `+key` コンボは修飾キー保持中にも一致する → 現行設定はガード済み。**追記しない**。
   - 値の末尾の `\` は `\\` と書く（1つだと次行を飲む）。
   - 設定を書き換えても自動リロードが効かない時がある → `mousemaster.log` の末尾で `Reloaded configuration file` を確認。出ていなければ再起動。
 
-### 3.4 ○ の変更は会社側 Claude が行う（ユーザーは症状を言って、押して確かめるだけ）
+### 3.4 ○ の変更は導入先側 Claude が行う（ユーザーは症状を言って、押して確かめるだけ）
 
-会社側 Claude はこの個人PC側と同じ道具を持つ（フォルダを繋げば `mousemaster.properties` と `mousemaster.log` を読み書きできる）。
+導入先側 Claude はこの元PC側と同じ道具を持つ（フォルダを繋げば `mousemaster.properties` と `mousemaster.log` を読み書きできる）。
 ユーザーがやるのは「ヒントの字が小さい」と言うことと、直した後にキーを押して見ること。編集・確認・記録は Claude。
 
-手順（個人PC側で1年やってきた作法。省略しない）:
+手順（元PC側で1年やってきた作法。省略しない）:
 
-1. **先に退避**: `mousemaster.properties.bak-<何の変更か>-<日付>` をコピーで作る（個人PCには 40 個以上ある。消さない）。
+1. **先に退避**: `mousemaster.properties.bak-<何の変更か>-<日付>` をコピーで作る（元PCには 40 個以上ある。消さない）。
 2. **1回に1つだけ変える**。2つ同時に変えると、効いたのがどちらか分からなくなる。
-3. **書き方はその場で上書き**（python の `open(p, 'w')` で書き直す等）。`sed -i` や `mv` で置き換えると変更通知が飛ばず、**リロードされない**（個人PCで実測）。
+3. **書き方はその場で上書き**（python の `open(p, 'w')` で書き直す等）。`sed -i` や `mv` で置き換えると変更通知が飛ばず、**リロードされない**（元PCで実測）。
 4. **`mousemaster.log` の末尾で `Reloaded configuration file` を確認**。出ていなければ同じ内容をもう一度その場で書く。それでも出なければ `stop-mousemaster.bat` → 起動し直す（分岐Aは `start-mousemaster-admin.bat`、Bは `mousemaster-start.bat`）。
    `Unable to load configuration file` が1回出ても、直後の変更イベントで読み直されるので実害はない。
 5. ユーザーに押してもらって確認。だめなら 1 の退避ファイルをその場で上書きコピーして戻す（これもその場で上書き）。
-6. 会社側 CLAUDE.md の「現在地」に **何を・なぜ・いくつからいくつへ** を1行で記録。個人PC側に取り込むため、8章の報告テンプレの「変えた設定」にも書く。
+6. 導入先側 CLAUDE.md の「現在地」に **何を・なぜ・いくつからいくつへ** を1行で記録。元PC側に取り込むため、8章の報告テンプレの「変えた設定」にも書く。
 
 × の要望（コンボ・ガード・remapping・macro）が出たら、**直さずに**「未着手・保留」に症状と再現手順を書く。それだけでよい。
 
 ### 3.5 環境の違いで起きやすいこと（一発で同じにはならない前提）
 
-| 起きやすいこと | 何が違うから | 対処 | 会社PCで直せるか |
+| 起きやすいこと | 何が違うから | 対処 | 導入先PCで直せるか |
 |---|---|---|---|
 | `a` の UI ヒントが遅い・出ない | ui-vision が GPU 依存 | `ui-accessibility` + `active-window` に | ○ |
-| ヒントの文字・格子・インジケーターが大きすぎ／小さすぎ | 解像度・DPI（個人PCは 3440x1440 ウルトラワイド）、モニタ枚数 | `hint.font-size`（今 16。個人PCでも 14〜18 で調整中）、hint2 のセル 10x15px、`zoom.percent=5`、`indicator.size` | ○ |
-| **Office で alt+H / alt+A が効かない** | `leftalt+a` / `leftalt+h`（仮想デスクトップ切替）は idle-mode でも生きている。Excel/Word のリボンのキーヒント（alt+H=ホーム、alt+A=データ）と衝突する。個人PCは Office を使わないので踏んでいない | アプリ条件（`app-alias` + `_{...}`）で Office を除外するか、キーを変える。**コンボ変更なので個人PC側で** | × |
-| 会社ツールのホットキーと衝突 | idle-mode でも生きているバインド（alt+a/h は確実。alt+ijkl 矢印、leftshift+@ 等はモードを要確認）と重なる | 同上 | × |
-| alt+e で PowerToys Run が出ない／別のものが出る | PowerToys Run のホットキーは個人PCで alt+e に変えてある（既定は alt+space）。会社PCの PowerToys は既定のまま、または無い | PowerToys 設定 > PowerToys Run > 起動のショートカットを合わせる。無ければ Windows キー検索で代用（2.6） | ○（Windows 側の設定） |
+| ヒントの文字・格子・インジケーターが大きすぎ／小さすぎ | 解像度・DPI（元PCは 3440x1440 ウルトラワイド）、モニタ枚数 | `hint.font-size`（今 16。元PCでも 14〜18 で調整中）、hint2 のセル 10x15px、`zoom.percent=5`、`indicator.size` | ○ |
+| **Office で alt+H / alt+A が効かない** | `leftalt+a` / `leftalt+h`（仮想デスクトップ切替）は idle-mode でも生きている。Excel/Word のリボンのキーヒント（alt+H=ホーム、alt+A=データ）と衝突する。元PCは Office を使わないので踏んでいない | アプリ条件（`app-alias` + `_{...}`）で Office を除外するか、キーを変える。**コンボ変更なので元PC側で** | × |
+| 導入先のツールのホットキーと衝突 | idle-mode でも生きているバインド（alt+a/h は確実。alt+ijkl 矢印、leftshift+@ 等はモードを要確認）と重なる | 同上 | × |
+| alt+e で PowerToys Run が出ない／別のものが出る | PowerToys Run のホットキーは元PCで alt+e に変えてある（既定は alt+space）。導入先PCの PowerToys は既定のまま、または無い | PowerToys 設定 > PowerToys Run > 起動のショートカットを合わせる。無ければ Windows キー検索で代用（2.6） | ○（Windows 側の設定） |
 | RDP / VDI / Citrix の窓の中で効かない・挙動が違う | 低レベルフックはローカル側にしか無い。リモート窓の中では向こうのキー処理になる | 仕様。リモート窓の外でだけ使う | — |
-| IME 周りの誤爆 | IME の種類・トグルキーが違う | 記録して個人PC側で | × |
-| **alt+g が OneCommander で効かない**（alt+f / alt+c 等は効く、mousemaster を止めても効かない） | NVIDIA アプリの G-Assist が **Alt+G をグローバルホットキーで掴む**（個人PCで 2026-10-07 に発生。NVIDIA が勝手に更新して掴んだ。ゲーム外では何も起きないので「効かない」に見える） | `check-altg-hotkey.bat`（A24/A25）を実行 → alt+g が TAKEN なら NVIDIA アプリ → 設定 → NVIDIA オーバーレイをオフ、またはオーバーレイ（Alt+Z）→ 歯車 → キーボードショートカットで G-Assist のキーを変える。他のキーでも同じ手が使える（ps1 の Probe 行を足す） | ○ |
-| 何も押していないのにカーソルが走り続ける | 移動キーを押したまま別モードに入り、離しがそのモードに落ちて StopMove が出ない型（個人PC 2026-10-07。arrowkey / temp-ZoomIt / screen-selection の 3 モードは [30] で塞いである）。別の型は「離しイベントの消失」（10 秒で暴走ブレーカー [28] が止める。モード跨ぎではブレーカーも効かない） | 止めるには同じ方向キーを押して離す。**何秒で止まったか・何を押して止まったかを記録**して個人PC側へ（ハーネス M51/M52 の総当たりで再現できる） | × |
+| IME 周りの誤爆 | IME の種類・トグルキーが違う | 記録して元PC側で | × |
+| **alt+g が OneCommander で効かない**（alt+f / alt+c 等は効く、mousemaster を止めても効かない） | NVIDIA アプリの G-Assist が **Alt+G をグローバルホットキーで掴む**（元PCで 2026-10-07 に発生。NVIDIA が勝手に更新して掴んだ。ゲーム外では何も起きないので「効かない」に見える） | `check-altg-hotkey.bat`（A24/A25）を実行 → alt+g が TAKEN なら NVIDIA アプリ → 設定 → NVIDIA オーバーレイをオフ、またはオーバーレイ（Alt+Z）→ 歯車 → キーボードショートカットで G-Assist のキーを変える。他のキーでも同じ手が使える（ps1 の Probe 行を足す） | ○ |
+| 何も押していないのにカーソルが走り続ける | 移動キーを押したまま別モードに入り、離しがそのモードに落ちて StopMove が出ない型（元PC 2026-10-07。arrowkey / temp-ZoomIt / screen-selection の 3 モードは [30] で塞いである）。別の型は「離しイベントの消失」（10 秒で暴走ブレーカー [28] が止める。モード跨ぎではブレーカーも効かない） | 止めるには同じ方向キーを押して離す。**何秒で止まったか・何を押して止まったかを記録**して元PC側へ（ハーネス M51/M52 の総当たりで再現できる） | × |
 | 昇格ウィンドウ・通知フライアウトの上で効かない | 分岐B（非昇格） | 仕様 | — |
-| normal-mode で `z` を押すと F1 が飛ぶ（ヘルプが開く等） | [31] Snipaste 連携: `z` は Snipaste のスニップ開始ホットキー F1 をどのアプリでも注入する。個人PCでは Snipaste（ポータブル、Downloads\mousemaster_92\Snipaste-2.11.3-x64、ホットキー既定）を常駐させている | Snipaste を会社PCにも入れる（zip 展開のみ・インストール不要）か、入れないなら properties 末尾 [31] の `app-alias.snipaste`、`virtual-key.snip`、`normal-mode.remapping.snip*` の計 7 行と [31b] の `normal-mode.remapping.unpinoldest` / `arrowkey-mode.remapping.unpinoldest` を `#` でコメントアウト。[31b] の Alt+Z は F14 を送るだけで、受け手の `snipaste-unpin.ahk`（AutoHotkey 常駐）は 1c の方針どおり会社PCには入れない（F14 は他のアプリでは無視される） | ○ |
+| normal-mode で `z` を押すと F1 が飛ぶ（ヘルプが開く等） | [31] Snipaste 連携: `z` は Snipaste のスニップ開始ホットキー F1 をどのアプリでも注入する。元PCでは Snipaste（ポータブル、Downloads\mousemaster_92\Snipaste-2.11.3-x64、ホットキー既定）を常駐させている | Snipaste を導入先PCにも入れる（zip 展開のみ・インストール不要。設定は同じフォルダの `config.ini` に入るので、元PCの `config.ini` を一緒にコピーすれば揃う: `[Snip] show_tips=false`＝切り取り中の左下のホットキー一覧を出さない、`ask_for_confirm_on_esc=false`＝Esc の確認なし、`[General] start_on_boot=true`＝Snipaste 自身のスタートアップ登録）か、入れないなら properties 末尾 [31] の `app-alias.snipaste`、`virtual-key.snip`、`normal-mode.remapping.snip*` の計 7 行と [31b] の `normal-mode.remapping.unpinoldest` / `arrowkey-mode.remapping.unpinoldest` を `#` でコメントアウト。[31b] の Alt+Z は F14 を送るだけで、受け手の `snipaste-unpin.ahk`（AutoHotkey 常駐）は 1c の方針どおり導入先PCには入れない（F14 は他のアプリでは無視される） | ○ |
 
-**運用**: 最初の1週間は「直さずに記録する」。会社側 CLAUDE.md の「未着手・保留」に溜め、○ はその場で、× はまとめて個人PC側で直して properties を**1回だけ**運び直す。往復は1〜2回で収まる想定。
-ハーネスを会社PCに入れずに済ませる手として、会社側 Claude のクラウド側でハーネスを回す案もある（個人PCでも実機・クラウド両方で回している）。× が多くなったら別途準備する。
+**運用**: 最初の1週間は「直さずに記録する」。導入先側 CLAUDE.md の「未着手・保留」に溜め、○ はその場で、× はまとめて元PC側で直して properties を**1回だけ**運び直す。往復は1〜2回で収まる想定。
+ハーネスを導入先PCに入れずに済ませる手として、導入先側 Claude のクラウド側でハーネスを回す案もある（元PCでも実機・クラウド両方で回している）。× が多くなったら別途準備する。
 
 ## 4. 導入後チェック
 
@@ -256,23 +248,23 @@ Defender 以外の EDR が居たら、2.1 の様子見を長めに取る。**弾
 
 ## 5. 使わないスクリプト（罠）
 
-- **`restart-mousemaster.bat`**: `taskkill /IM mousemaster.exe` に `/F` が無く、コンソールアプリは WM_CLOSE を無視するので**止まらない**（2026-08-14 実測）。その直後に exe を**ガード無しで直接起動**するので二重起動になり得る。個人PCにも残っているが使っていない。止める→起動は `stop-mousemaster.bat` → `start-mousemaster-admin.bat`（A）または `mousemaster-start.bat`（B）で行う。
+- **`restart-mousemaster.bat`**: `taskkill /IM mousemaster.exe` に `/F` が無く、コンソールアプリは WM_CLOSE を無視するので**止まらない**（2026-08-14 実測）。その直後に exe を**ガード無しで直接起動**するので二重起動になり得る。元PCにも残っているが使っていない。止める→起動は `stop-mousemaster.bat` → `start-mousemaster-admin.bat`（A）または `mousemaster-start.bat`（B）で行う。
 
 ## 6. ロールバック
 
 - 新しい方を止める: `stop-mousemaster.bat`。分岐Aなら `schtasks /Delete /TN mousemaster-admin /F`（管理者）、分岐Bなら Startup の `mousemaster-prewarm.lnk` を消す。
 - 旧 v64 は触っていないので、止めた起動口を戻せば元どおり。
 
-## 7. 会社PC側に作る `CLAUDE.md` の雛形
+## 7. 導入先PC側に作る `CLAUDE.md` の雛形
 
 ```markdown
-# mousemaster（会社PC）— 引き継ぎ文書
+# mousemaster（導入先PC）— 引き継ぎ文書
 
-> Claudeへ: この文書はあなたが維持する。ここは個人PCの構成を YYYY-MM-DD に写した複製。
-> 正本は個人PC側。ここで mousemaster.properties を編集しない。
+> Claudeへ: この文書はあなたが維持する。ここは元PCの構成を YYYY-MM-DD に写した複製。
+> 正本は元PC側。ここで mousemaster.properties を編集しない。
 
 ## 1. これは何か
-Win11 / <機種> / <配列> で mousemaster を運用。個人PCの PLAN-company-pc-migration.md に従って導入。
+Win11 / <機種> / <配列> で mousemaster を運用。元PCの SETUP.md に従って導入。
 
 ## 2. 不変条件
 - mousemaster.properties の編集は PLAN 3章の ○/× に従う。○（数値・切替・コメントアウト）は可、×（コンボ・ガード・remapping・macro）は不可。変えたら1行ずつここに記録し、× の要望は「未着手・保留」へ
@@ -285,7 +277,6 @@ Win11 / <機種> / <配列> で mousemaster を運用。個人PCの PLAN-company
 - 分岐: A（昇格タスク mousemaster-admin）/ B（Startup ショートカット）
 - 即停止（2.6）: 入れた（A: タスク mousemaster-stop / B: 直接 kill）/ 入れていない（理由: ）。アイコン: 貼った / 貼っていない
 - 導入後チェック（4章）の結果: ...
-- セキュリティソフト: <名前> / 警告: <なし・内容>
 
 ## 4. ファイル索引
 （付録Aのうち置いたもの）
@@ -293,25 +284,24 @@ Win11 / <機種> / <配列> で mousemaster を運用。個人PCの PLAN-company
 ## 5. 未着手・保留
 ```
 
-## 8. 個人PC側へ返す報告テンプレ（ユーザーが個人PCの Claude に貼る）
+## 8. 元PC側へ返す報告テンプレ（ユーザーが元PCの Claude に貼る）
 
 ```
-会社PC移行 結果（YYYY-MM-DD）
+導入先PC移行 結果（YYYY-MM-DD）
 - 分岐: A(昇格) / B(非昇格) / 未導入（理由: ）
 - ハッシュ照合: exe ○/× properties ○/×   show-version: <出力1行>
 - 旧v64: 場所=<path> / 自動起動=<あった→止め方 / なかった>
 - 4章チェック: 1○ 2○ 3○ 4○ 5○ 6○ 7○ 8○ 9○（該当分のみ）
 - 即停止(2.6): 入れた(A/B) / 入れていない（理由: ）
-- セキュリティソフト: <名前> / 警告: <なし・内容>
 - 変えた設定: <なし / ui-vision→ui-accessibility 等>
 - 引っかかった点: <なし / 内容>
 ```
 
 ---
 
-## 付録A: スクリプト全文（25本。A1〜A14 は個人PC `mousemaster_92` の 2026-09-25 時点、A15〜A23 は 2026-10-06 時点、A24〜A25 は 2026-10-07 時点と同一）
+## 付録A: スクリプト全文（25本。A1〜A14 は元PC `mousemaster_92` の 2026-09-25 時点、A15〜A23 は 2026-10-06 時点、A24〜A25 は 2026-10-07 時点と同一）
 
-保存規則: **ASCII・CRLF**、ファイル名は見出しどおり、会社フォルダ直下に置く。
+保存規則: **ASCII・CRLF**、ファイル名は見出しどおり、導入先のフォルダ直下に置く。
 Claude が書く場合は、書いたあと `(Get-Content -Raw .\<file>) -match "`r`n"` が True になることを確認する。
 
 ### A1. `mousemaster-start.bat` — 手動起動（二重起動ガード付き）
@@ -821,7 +811,7 @@ Write-Host ""
 Stop-Transcript | Out-Null
 ```
 
-### A14. `show-version.bat` — 版の確認（出力をユーザー経由で個人PC側と照合）
+### A14. `show-version.bat` — 版の確認（出力をユーザー経由で元PC側と照合）
 
 ```bat
 @echo off
@@ -1119,7 +1109,7 @@ rem ---------------------------------------------------------------------------
 rem  Stop a NON-elevated mousemaster right now. No admin rights, no UAC.
 rem
 rem  For a PC where mousemaster runs without elevation (branch B of the
-rem  company-PC plan: Startup shortcut autostart). Where mousemaster runs
+rem  setup guide: Startup shortcut autostart). Where mousemaster runs
 rem  elevated (mousemaster-admin task) this cannot end it - use
 rem  stop-mousemaster-admin.bat there (needs setup-stop-task.bat once).
 rem
@@ -1338,4 +1328,4 @@ Write-Host 'Done. The same text is in altg-check.txt.'
 Stop-Transcript | Out-Null
 ```
 
-（付録おわり。`undo-admin-autostart.bat`（分岐Aを全部戻す）は 2026-10-14 からリポジトリにも入れた。個人PC側の `mousemaster_92` に `fix-topmost.bat`（最前面貼り付きの解除）、`check-uiaccess.bat`（昇格の確認）もある。必要になったらユーザー経由で取り寄せる。）
+（付録おわり。`undo-admin-autostart.bat`（分岐Aを全部戻す）は 2026-10-14 からリポジトリにも入れた。元PC側の `mousemaster_92` に `fix-topmost.bat`（最前面貼り付きの解除）、`check-uiaccess.bat`（昇格の確認）もある。必要になったらユーザー経由で取り寄せる。）

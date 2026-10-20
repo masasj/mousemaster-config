@@ -3,7 +3,7 @@ rem ---------------------------------------------------------------------------
 rem  Stop a NON-elevated mousemaster right now. No admin rights, no UAC.
 rem
 rem  For a PC where mousemaster runs without elevation (branch B of the
-rem  company-PC plan: Startup shortcut autostart). Where mousemaster runs
+rem  setup guide: Startup shortcut autostart). Where mousemaster runs
 rem  elevated (mousemaster-admin task) this cannot end it - use
 rem  stop-mousemaster-admin.bat there (needs setup-stop-task.bat once).
 rem

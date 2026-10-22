@@ -30,58 +30,59 @@
 ; as claude-to-front.ahk). Events are written to snipaste-unpin.log next to
 ; this script.
 
-#Requires AutoHotkey v2.0
-#SingleInstance Force
-Persistent()
+; Ported into mm-companion on 2026-10-22: functions and state carry the Unpin_ prefix, the
+; settings sit in companion\settings.ahk, and what ran at load time is now Unpin_Init().
 
-SCAN_MS  := 500
-LogFile  := A_ScriptDir "\snipaste-unpin.log"
-global pins := []            ; window handles, oldest first
-global closing := Map()      ; hwnd -> tick when an Esc was sent (ignored by Scan for a while)
+global Unpin_pins := []            ; window handles, oldest first
+global Unpin_closing := Map()      ; hwnd -> tick when an Esc was sent (ignored by Unpin_Scan for a while)
 
-CloseStaleCopies()
-Log("start (" A_ScriptName " in " SubStr(A_ScriptDir, InStr(A_ScriptDir, "\", , -1) + 1) ")")   ; folder name only: no user path in the log
-SetTimer(Scan, SCAN_MS)
+Unpin_Init() {
+    global Unpin_pins, Unpin_closing
+    Log("unpin", "start (" A_ScriptName " in " SubStr(A_ScriptDir, InStr(A_ScriptDir, "\", , -1) + 1) ")")   ; folder name only: no user path in the log
+    SetTimer(Unpin_Scan, Unpin_ScanMs)
+    Core_Hotkeys("F14", (*) => Unpin_CloseOldest())
+    Core_Hotkeys("F15", (*) => Unpin_CloseAll())
+}
 
-Scan() {
-    global pins, closing
+Unpin_Scan() {
+    global Unpin_pins, Unpin_closing
     keep := []
-    for h in pins
-        if IsPin(h)
+    for h in Unpin_pins
+        if Unpin_IsPin(h)
             keep.Push(h)
-    pins := keep
-    for h, t in closing.Clone()
-        if (A_TickCount - t > 3000 || !IsPin(h))
-            closing.Delete(h)
+    Unpin_pins := keep
+    for h, t in Unpin_closing.Clone()
+        if (A_TickCount - t > 3000 || !Unpin_IsPin(h))
+            Unpin_closing.Delete(h)
     for h in WinGetList("ahk_exe Snipaste.exe") {
-        if !IsPin(h) || closing.Has(h)
+        if !Unpin_IsPin(h) || Unpin_closing.Has(h)
             continue
         known := false
-        for p in pins
+        for p in Unpin_pins
             if (p = h) {
                 known := true
                 break
             }
         if !known {
-            pins.Push(h)
-            Log("pin #" pins.Length " appeared: " Describe(h))
+            Unpin_pins.Push(h)
+            Log("unpin", "pin #" Unpin_pins.Length " appeared: " Unpin_Describe(h))
         }
     }
 }
 
-IsPin(h) {
+Unpin_IsPin(h) {
     if !WinExist("ahk_id " h)
         return false
     if !DllCall("IsWindowVisible", "ptr", h)
         return false
-    if !(WinGetExStyle("ahk_id " h) & 0x8)      ; WS_EX_TOPMOST: pins float on top
+    if !(WinGetExStyle("ahk_id " h) & 0x8)      ; WS_EX_TOPMOST: Unpin_pins float on top
         return false
     if (WinGetTitle("ahk_id " h) != "Paster - Snipaste")   ; the snip overlay, magnifier and toolbar are titled "Snipaste"
         return false
     return true
 }
 
-Describe(h) {
+Unpin_Describe(h) {
     try {
         WinGetPos(&x, &y, &w, &hgt, "ahk_id " h)
         return "'" WinGetTitle("ahk_id " h) "' " w "x" hgt " at " x "," y " (" h ")"
@@ -90,51 +91,51 @@ Describe(h) {
     }
 }
 
-ClosePin(h) {
-    global closing
-    closing[h] := A_TickCount
+Unpin_ClosePin(h) {
+    global Unpin_closing
+    Unpin_closing[h] := A_TickCount
     if WinActive("ahk_id " h) {
-        Log("close (active, tagged Esc keystroke) " Describe(h))
-        SendTaggedEsc()
+        Log("unpin", "close (active, tagged Esc keystroke) " Unpin_Describe(h))
+        Unpin_SendTaggedEsc()
     } else {
-        Log("close (posted Esc) " Describe(h))
-        PostEsc(h)
+        Log("unpin", "close (posted Esc) " Unpin_Describe(h))
+        Unpin_PostEsc(h)
     }
-    SetTimer(() => Retry(h), -700)       ; a closing pin fades out for a moment; do not Esc it twice
+    SetTimer(() => Unpin_Retry(h), -700)       ; a Unpin_closing pin fades out for a moment; do not Esc it twice
 }
 
-Retry(h) {
-    if !IsPin(h)
+Unpin_Retry(h) {
+    if !Unpin_IsPin(h)
         return
-    Log("still there: activating and sending a tagged Esc to " h)
+    Log("unpin", "still there: activating and sending a tagged Esc to " h)
     try WinActivate("ahk_id " h)
     Sleep(60)
     if WinActive("ahk_id " h)
-        SendTaggedEsc()
+        Unpin_SendTaggedEsc()
     else
-        PostEsc(h)
+        Unpin_PostEsc(h)
 }
 
-PostEsc(h) {
+Unpin_PostEsc(h) {
     try {
         PostMessage(0x0100, 0x1B, 0x00010001, , "ahk_id " h)   ; WM_KEYDOWN VK_ESCAPE, scan 1
         PostMessage(0x0101, 0x1B, 0xC0010001, , "ahk_id " h)   ; WM_KEYUP
     }
 }
 
-SendTaggedEsc() {
+Unpin_SendTaggedEsc() {
     ; SendInput of VK_ESCAPE down + up, dwExtraInfo = 0x4D4D4B42 (mousemaster's
     ; MOUSEMASTER_INJECTED_EVENT_SIGNATURE), INPUT is 40 bytes on x64.
     ; mousemaster eats the physical Alt of Alt+Z, so the OS normally does not see Alt
     ; down here. If it ever does, release it first (tagged): Alt+Esc is the Windows
     ; window switcher, not an Esc for the pin.
     if GetKeyState("Alt")
-        SendTaggedKey(0xA4, 0x38, true)       ; VK_LMENU up
-    SendTaggedKey(0x1B, 0x01, false)          ; Esc down
-    SendTaggedKey(0x1B, 0x01, true)           ; Esc up
+        Unpin_SendTaggedKey(0xA4, 0x38, true)       ; VK_LMENU up
+    Unpin_SendTaggedKey(0x1B, 0x01, false)          ; Esc down
+    Unpin_SendTaggedKey(0x1B, 0x01, true)           ; Esc up
 }
 
-SendTaggedKey(vk, sc, up) {
+Unpin_SendTaggedKey(vk, sc, up) {
     static SIG := 0x4D4D4B42, KEYEVENTF_KEYUP := 2
     buf := Buffer(40, 0)
     NumPut("UInt", 1, buf, 0)                 ; INPUT_KEYBOARD
@@ -144,64 +145,27 @@ SendTaggedKey(vk, sc, up) {
     NumPut("UPtr", SIG, buf, 24)
     n := DllCall("SendInput", "UInt", 1, "Ptr", buf, "Int", 40, "UInt")
     if (n != 1)
-        Log("SendInput failed (err " A_LastError ")")
+        Log("unpin", "SendInput failed (err " A_LastError ")")
 }
 
-CloseOldest() {
-    global pins
-    Scan()
-    Log("hotkey " A_ThisHotkey " (OS sees alt=" GetKeyState("Alt") " shift=" GetKeyState("Shift") "), " pins.Length " pin(s)")
-    if (pins.Length = 0)
+Unpin_CloseOldest() {
+    global Unpin_pins
+    Unpin_Scan()
+    Log("unpin", "hotkey " A_ThisHotkey " (OS sees alt=" GetKeyState("Alt") " shift=" GetKeyState("Shift") "), " Unpin_pins.Length " pin(s)")
+    if (Unpin_pins.Length = 0)
         return
-    ClosePin(pins.RemoveAt(1))
+    Unpin_ClosePin(Unpin_pins.RemoveAt(1))
 }
 
-CloseAll() {
-    global pins
-    Scan()
-    if (pins.Length = 0) {
-        Log("F15: no pin on screen")
+Unpin_CloseAll() {
+    global Unpin_pins
+    Unpin_Scan()
+    if (Unpin_pins.Length = 0) {
+        Log("unpin", "F15: no pin on screen")
         return
     }
-    while (pins.Length > 0) {
-        ClosePin(pins.RemoveAt(1))
+    while (Unpin_pins.Length > 0) {
+        Unpin_ClosePin(Unpin_pins.RemoveAt(1))
         Sleep(120)
-    }
-}
-
-CloseStaleCopies() {
-    ; Another copy of this script (e.g. one started from github-export\) would
-    ; answer F14 too. Ask it to exit. AutoHotkey's hidden main window is titled
-    ; "<script path> - AutoHotkey v2...".
-    prev := A_DetectHiddenWindows
-    DetectHiddenWindows(true)
-    for h in WinGetList("ahk_class AutoHotkey") {
-        t := WinGetTitle("ahk_id " h)
-        if InStr(t, "snipaste-unpin.ahk") && !InStr(t, A_ScriptFullPath) {
-            try PostMessage(0x0111, 65307, 0, , "ahk_id " h)   ; WM_COMMAND ID_FILE_EXIT: the other script exits
-            Log("asked a stale copy of this script (another folder) to exit")
-        }
-    }
-    DetectHiddenWindows(prev)
-}
-
-; mousemaster sends F14 on Alt+Z; whether the OS still sees Alt (or Shift) held at
-; that moment depends on the mode, so every modifier variant is registered. Each
-; line is one RegisterHotKey: no wildcard (*), which would need the keyboard hook.
-F14::CloseOldest()
-+F14::CloseOldest()
-!F14::CloseOldest()
-!+F14::CloseOldest()
-F15::CloseAll()
-+F15::CloseAll()
-!F15::CloseAll()
-!+F15::CloseAll()
-
-Log(msg) {
-    global LogFile
-    try {
-        if FileExist(LogFile) && FileGetSize(LogFile, "K") > 256
-            FileDelete(LogFile)
-        FileAppend(FormatTime(, "yyyy-MM-dd HH:mm:ss") " " msg "`n", LogFile)
     }
 }

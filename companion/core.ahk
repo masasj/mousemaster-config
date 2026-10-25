@@ -169,6 +169,60 @@ Core_SetupTray() {
     A_TrayMenu.Add()
     A_TrayMenu.Add("Exit", (*) => ExitApp())
     SetTimer(Core_RefreshTip, 2000)
+    ; 2026-10-24: F21 (mousemaster sends it on alt+w in normal-mode) opens this tray menu at the
+    ; mouse, so the pointer never has to travel to the tray. Menu.Show() with no position
+    ; uses the mouse position.
+    ; 2026-10-25: F21 (mousemaster sends it on alt+a) opens Windows' own "show hidden icons" flyout,
+    ; every tray app, not only this script: Win+B puts the focus on the notification area, Enter
+    ; opens the flyout; in it the arrow keys pick an icon, Enter is a left click and the menu key a
+    ; right click. This script's own menu is its icon in there (the green H).
+    ; Done here rather than as a mousemaster remapping: the OS still sees the Alt of alt+a (Win+B
+    ; arrived as Win+Alt+B, the HDR toggle), and mousemaster skips a -leftalt it believes up.
+    Core_Hotkeys("F21", (*) => Core_OpenTrayOverflow())
+}
+
+; Every key tagged with mousemaster's signature, so mousemaster lets it through in any mode.
+Core_OpenTrayOverflow() {
+    Log("core", "tray overflow (F21), alt " (GetKeyState("Alt") ? "down" : "up") ", physical " (GetKeyState("Alt", "P") ? "down" : "up"))
+    ; wait for the physical Alt to come up (2 s at most): its auto-repeat puts Alt down again
+    t := A_TickCount
+    while GetKeyState("Alt", "P") && A_TickCount - t < 2000
+        Sleep 15
+    Sleep 30
+    if GetKeyState("Alt") {
+        Core_TagTap(0xA2, 0x1D)                  ; ctrl tap first, so the lone Alt release opens no menu bar
+        Core_TagKey(0xA4, 0x38, true)            ; left alt up
+        Core_TagKey(0xA5, 0x38, true)            ; right alt up
+    }
+    Core_TagKey(0x5B, 0x5B, false)               ; left win down
+    Core_TagTap(0x42, 0x30)                      ; b
+    Core_TagKey(0x5B, 0x5B, true)                ; left win up
+    Sleep 150
+    Core_TagTap(0x0D, 0x1C)                      ; enter: open the flyout
+}
+
+global Core_MenuOpen := false
+
+; Show() blocks until the menu closes, so the hotkey thread hands it to a timer, and a
+; second F21 while it is open closes it (Esc) instead of stacking a second menu.
+Core_ShowTrayMenu() {
+    global Core_MenuOpen
+    if Core_MenuOpen {
+        Log("core", "tray menu: F21 while open -> close")
+        Send("{Esc}")
+        return
+    }
+    SetTimer(Core_ShowTrayMenuNow, -1)
+}
+
+Core_ShowTrayMenuNow() {
+    global Core_MenuOpen
+    Core_MenuOpen := true
+    t := A_TickCount
+    Log("core", "tray menu at the mouse (F21)")
+    try A_TrayMenu.Show()
+    Core_MenuOpen := false
+    Log("core", "tray menu closed after " (A_TickCount - t) " ms")
 }
 
 Core_SetStatus(mod, text) {

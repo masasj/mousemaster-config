@@ -10,7 +10,9 @@
 ;   cursor is the I-beam                     : F17 tap  -> mousemaster.properties: #ibeam
 ;   cursor is none of the standard shapes    : F19 tap  -> #customcursor
 ;     (A_Cursor = Unknown: an app's own cursor or drag image, or no cursor)
-;   cursor is any other standard shape       : F18 tap  -> ~ibeam ~customcursor
+;   cursor is the crosshair (Cross)          : F20 tap  -> #crosshair (2026-10-24: the Windows
+;     snipping overlay, Win+Shift+S, draws one; a drag under it is a capture, not a move)
+;   cursor is any other standard shape       : F18 tap  -> ~ibeam ~customcursor ~crosshair
 ;
 ; The current state is also re-sent every RESEND_MS so a transition that fell
 ; into a mode without the F17/F18/F19 macros (a hint mode) is caught up. Nothing
@@ -27,7 +29,7 @@
 ; Ported into mm-companion on 2026-10-22: functions and state carry the Cursor_ prefix, the
 ; settings sit in companion\settings.ahk, and what ran at load time is now Cursor_Init().
 
-global Cursor_last := ""        ; "" not known yet, "I" I-beam, "C" custom (A_Cursor Unknown), "A" any other standard shape
+global Cursor_last := ""        ; "" not known yet, "I" I-beam, "C" custom (A_Cursor Unknown), "X" crosshair (Cross), "A" any other standard shape
 global Cursor_lastSent := 0
 global Cursor_mmSeen := false
 
@@ -40,7 +42,7 @@ Cursor_Init() {
 Cursor_Poll() {
     global Cursor_last, Cursor_lastSent, Cursor_mmSeen
     c := A_Cursor
-    cur := (c = "IBeam") ? "I" : (c = "Unknown") ? "C" : "A"
+    cur := (c = "IBeam") ? "I" : (c = "Unknown") ? "C" : (c = "Cross") ? "X" : "A"
     changed := (cur != Cursor_last)
     if !changed && (A_TickCount - Cursor_lastSent < Cursor_ResendMs)
         return
@@ -53,9 +55,9 @@ Cursor_Poll() {
         Cursor_last := cur
         return
     }
-    SendInput(cur = "I" ? "{Blind}{F17}" : cur = "C" ? "{Blind}{F19}" : "{Blind}{F18}")
+    SendInput(cur = "I" ? "{Blind}{F17}" : cur = "C" ? "{Blind}{F19}" : cur = "X" ? "{Blind}{F20}" : "{Blind}{F18}")
     if changed
-        Log("cursor", cur = "I" ? "I-beam -> F17" : cur = "C" ? "custom cursor -> F19" : "other -> F18")
+        Log("cursor", (cur = "I" ? "I-beam -> F17" : cur = "C" ? "custom cursor -> F19" : cur = "X" ? "crosshair -> F20" : "other -> F18") " (" c ")")
     Cursor_last := cur
     Cursor_lastSent := A_TickCount
 }

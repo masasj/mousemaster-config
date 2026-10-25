@@ -3,7 +3,8 @@
 
 global Enable := Map("cursor", true, "unpin", true, "glance", true, "front", true, "ocdup", true)
 
-; cursor (mousemaster\cursor.ahk): the cursor shape -> F17 I-beam / F19 an app's own cursor / F18 other
+; core: F21 opens Windows' hidden-icons flyout (mousemaster sends it on alt+a)
+; cursor (mousemaster\cursor.ahk): the cursor shape -> F17 I-beam / F19 an app's own cursor / F20 crosshair / F18 other
 global Cursor_PollMs := 16          ; how often the cursor is read
 global Cursor_ResendMs := 3000      ; the current state is re-sent this often
 

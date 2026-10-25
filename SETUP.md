@@ -1,6 +1,6 @@
 # 導入先PCへの移行プラン（v64 → 現行フル構成）— Claude間引き継ぎ版
 
-作成: 2026-09-25 元PC側のClaudeが、`mousemaster_92` の実フォルダと `CLAUDE.md` を読んで作成。
+作成: 2026-09-25 元PC側のClaudeが、`mousemaster`（2026-10-24 までは `mousemaster_92`） の実フォルダと `CLAUDE.md` を読んで作成。
 更新: 2026-10-06 即停止「alt+e → stop」とランチャーのアイコン（2.6 節、付録 A15〜A23）を追加。どちらも任意。
 更新: 2026-10-07 `mousemaster.properties` を更新（モード跨ぎで移動が止まらなくなる穴を塞いだ [30]）。3.5 に「alt+g が効かない＝NVIDIA G-Assist」と「カーソルが走り続ける」を追加、診断スクリプト A24/A25（任意）を追加。
 更新: 2026-10-12 `mousemaster.properties` を更新（[31] Snipaste 連携: z=スニップ開始、もう一度 z=その場に貼る）。3.5 に Snipaste 無しの時の注意を追加。この文書とスクリプト 25 本・properties・カーソル・アイコンは GitHub の `masasj/mousemaster-config` にも置いた（exe は Releases）。
@@ -10,7 +10,7 @@
 元PCと導入先PCの間でファイルを直接やりとりする手段は無い。運ぶのはユーザー。
 
 **ユーザーが導入先PCのClaudeに貼る一文（案）**:
-> `C:\Users\<ユーザー名>\Downloads\mousemaster_92\SETUP.md` を読んで、書いてある順に進めて。判断が要るところだけ聞いて。
+> `C:\Users\<ユーザー名>\Downloads\mousemaster\SETUP.md` を読んで、書いてある順に進めて。判断が要るところだけ聞いて。
 
 （.md をファイルごと運ばない場合は、この文書の全文をチャットに貼ってもよい。付録Aのスクリプトはそこから再現できる。）
 
@@ -114,8 +114,8 @@ whoami /groups | findstr /C:"S-1-5-32-544"
 
 ### 2.1 最小構成で動作確認（非昇格・自動起動なし）→ 数日様子見
 
-1. 導入先PCに `C:\Users\<導入先のユーザー名>\Downloads\mousemaster_92` を作る。
-   （名前を `mousemaster_92` に揃える理由: skill `/mm` が Downloads 直下の `mousemaster*` からバージョン番号最大のフォルダを探すため。中身は 96c7f26 だが名前は元PCに合わせる。）
+1. 導入先PCに `C:\Users\<導入先のユーザー名>\Downloads\mousemaster` を作る。
+   （名前を `mousemaster` に揃える理由: 2026-10-24 から元PCのフォルダ名も版番号なしの `mousemaster`。skill `/mm` とハーネスの `run.sh` はまずこの名前を探し、無ければ `mousemaster*` の版番号最大に落ちる。）
 2. `mousemaster.exe` と `mousemaster.properties` を置き、**1a のハッシュを照合**。
 3. 付録Aから最低限 `mousemaster-start.bat`, `mousemaster-autostart.bat`, `stop-mousemaster.bat`, `show-version.bat`, `restore-cursor.bat`, `restore-cursor.ps1` を作る（ASCII+CRLF）。
 4. 旧 v64 が動いていたら止める（2.0(1)）。
@@ -227,7 +227,7 @@ whoami /groups | findstr /C:"S-1-5-32-544"
 | **alt+g が OneCommander で効かない**（alt+f / alt+c 等は効く、mousemaster を止めても効かない） | NVIDIA アプリの G-Assist が **Alt+G をグローバルホットキーで掴む**（元PCで 2026-10-07 に発生。NVIDIA が勝手に更新して掴んだ。ゲーム外では何も起きないので「効かない」に見える） | `check-altg-hotkey.bat`（A24/A25）を実行 → alt+g が TAKEN なら NVIDIA アプリ → 設定 → NVIDIA オーバーレイをオフ、またはオーバーレイ（Alt+Z）→ 歯車 → キーボードショートカットで G-Assist のキーを変える。他のキーでも同じ手が使える（ps1 の Probe 行を足す） | ○ |
 | 何も押していないのにカーソルが走り続ける | 移動キーを押したまま別モードに入り、離しがそのモードに落ちて StopMove が出ない型（元PC 2026-10-07。arrowkey / temp-ZoomIt / screen-selection の 3 モードは [30] で塞いである）。別の型は「離しイベントの消失」（10 秒で暴走ブレーカー [28] が止める。モード跨ぎではブレーカーも効かない） | 止めるには同じ方向キーを押して離す。**何秒で止まったか・何を押して止まったかを記録**して元PC側へ（ハーネス M51/M52 の総当たりで再現できる） | × |
 | 昇格ウィンドウ・通知フライアウトの上で効かない | 分岐B（非昇格） | 仕様 | — |
-| normal-mode で `z` を押すと F1 が飛ぶ（ヘルプが開く等） | [31] Snipaste 連携: `z` は Snipaste のスニップ開始ホットキー F1 をどのアプリでも注入する。元PCでは Snipaste（ポータブル、Downloads\mousemaster_92\Snipaste-2.11.3-x64、ホットキー既定）を常駐させている | Snipaste を導入先PCにも入れる（zip 展開のみ・インストール不要。設定は同じフォルダの `config.ini` に入るので、元PCの `config.ini` を一緒にコピーすれば揃う: `[Snip] show_tips=false`＝切り取り中の左下のホットキー一覧を出さない、`ask_for_confirm_on_esc=false`＝Esc の確認なし、`[General] start_on_boot=true`＝Snipaste 自身のスタートアップ登録）か、入れないなら properties 末尾 [31] の `app-alias.snipaste`、`virtual-key.snip`、`normal-mode.remapping.snip*` の計 7 行と [31b] の `normal-mode.remapping.unpinoldest` / `arrowkey-mode.remapping.unpinoldest` を `#` でコメントアウト。[31b] の Alt+Z は F14 を送るだけで、受け手の `snipaste-unpin.ahk`（AutoHotkey 常駐）は 1c の方針どおり導入先PCには入れない（F14 は他のアプリでは無視される） | ○ |
+| normal-mode で `z` を押すと F1 が飛ぶ（ヘルプが開く等） | [31] Snipaste 連携: `z` は Snipaste のスニップ開始ホットキー F1 をどのアプリでも注入する。元PCでは Snipaste（ポータブル、Downloads\mousemaster\Snipaste-2.11.3-x64、ホットキー既定）を常駐させている | Snipaste を導入先PCにも入れる（zip 展開のみ・インストール不要。設定は同じフォルダの `config.ini` に入るので、元PCの `config.ini` を一緒にコピーすれば揃う: `[Snip] show_tips=false`＝切り取り中の左下のホットキー一覧を出さない、`ask_for_confirm_on_esc=false`＝Esc の確認なし、`[General] start_on_boot=true`＝Snipaste 自身のスタートアップ登録）か、入れないなら properties 末尾 [31] の `app-alias.snipaste`、`virtual-key.snip`、`normal-mode.remapping.snip*` の計 7 行と [31b] の `normal-mode.remapping.unpinoldest` / `arrowkey-mode.remapping.unpinoldest` を `#` でコメントアウト。[31b] の Alt+Z は F14 を送るだけで、受け手の `snipaste-unpin.ahk`（AutoHotkey 常駐）は 1c の方針どおり導入先PCには入れない（F14 は他のアプリでは無視される） | ○ |
 
 **運用**: 最初の1週間は「直さずに記録する」。導入先側 CLAUDE.md の「未着手・保留」に溜め、○ はその場で、× はまとめて元PC側で直して properties を**1回だけ**運び直す。往復は1〜2回で収まる想定。
 ハーネスを導入先PCに入れずに済ませる手として、導入先側 Claude のクラウド側でハーネスを回す案もある（元PCでも実機・クラウド両方で回している）。× が多くなったら別途準備する。
@@ -299,7 +299,7 @@ Win11 / <機種> / <配列> で mousemaster を運用。元PCの SETUP.md に従
 
 ---
 
-## 付録A: スクリプト全文（25本。A1〜A14 は元PC `mousemaster_92` の 2026-09-25 時点、A15〜A23 は 2026-10-06 時点、A24〜A25 は 2026-10-07 時点と同一）
+## 付録A: スクリプト全文（25本。A1〜A14 は元PC `mousemaster`（2026-10-24 までは `mousemaster_92`） の 2026-09-25 時点、A15〜A23 は 2026-10-06 時点、A24〜A25 は 2026-10-07 時点と同一）
 
 保存規則: **ASCII・CRLF**、ファイル名は見出しどおり、導入先のフォルダ直下に置く。
 Claude が書く場合は、書いたあと `(Get-Content -Raw .\<file>) -match "`r`n"` が True になることを確認する。
@@ -1328,4 +1328,4 @@ Write-Host 'Done. The same text is in altg-check.txt.'
 Stop-Transcript | Out-Null
 ```
 
-（付録おわり。`undo-admin-autostart.bat`（分岐Aを全部戻す）は 2026-10-14 からリポジトリにも入れた。元PC側の `mousemaster_92` に `fix-topmost.bat`（最前面貼り付きの解除）、`check-uiaccess.bat`（昇格の確認）もある。必要になったらユーザー経由で取り寄せる。）
+（付録おわり。`undo-admin-autostart.bat`（分岐Aを全部戻す）は 2026-10-14 からリポジトリにも入れた。元PC側の `mousemaster`（2026-10-24 までは `mousemaster_92`） に `fix-topmost.bat`（最前面貼り付きの解除）、`check-uiaccess.bat`（昇格の確認）もある。必要になったらユーザー経由で取り寄せる。）
